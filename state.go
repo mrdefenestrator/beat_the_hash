@@ -8,7 +8,7 @@ import (
 	"io/ioutil"
 	//"path/filepath"
 	"encoding/json"
-	"encoding/base64"
+	//"encoding/base64"
 	//"gopkg.in/yaml.v2"
 )
 
@@ -35,7 +35,6 @@ func (s *State) save(path string) {
 	//data, err1 := yaml.Marshal(s)
 	data, err1 := json.Marshal(s)
 	check(err1)
-	fmt.Print(data)
 	err2 := ioutil.WriteFile(path, data, 0644)
 	check(err2)
 }
@@ -49,43 +48,43 @@ func (s *State) load(path string) {
 	check(err2)
 }
 
-func (s *State) MarshalJSON() ([]byte, error) {
-	type Alias State
-	return json.Marshal(&struct {
-		Value     string `json:"value"`
-		LastGuess string `json:"last_guess"`
-		*Alias
-	}{
-		Value:     base64.StdEncoding.EncodeToString(s.Value),
-		LastGuess: base64.StdEncoding.EncodeToString(s.LastGuess),
-		Alias:     (*Alias)(s),
-	})
-}
-
-func (s *State) UnmarshalJSON(data []byte) error {
-	type Alias State
-	aux := &struct {
-		Value      string  `json:"value"`
-		LastGuess  string  `json:"last_guess"`
-		*Alias
-	} {
-		Alias: (*Alias)(s),
-	}
-
-	if err := json.Unmarshal(data, &aux); err != nil {
-		return err
-	}
-
-	value, err := base64.StdEncoding.DecodeString(aux.Value)
-	check(err)
-	s.Value = value
-
-	last_guess, err := base64.StdEncoding.DecodeString(aux.LastGuess)
-	check(err)
-	s.LastGuess = last_guess
-
-	return nil
-}
+//func (s *State) MarshalJSON() ([]byte, error) {
+//	type Alias State
+//	return json.Marshal(&struct {
+//		Value     string `json:"value"`
+//		LastGuess string `json:"last_guess"`
+//		*Alias
+//	}{
+//		Value:     base64.StdEncoding.EncodeToString(s.Value),
+//		LastGuess: base64.StdEncoding.EncodeToString(s.LastGuess),
+//		Alias:     (*Alias)(s),
+//	})
+//}
+//
+//func (s *State) UnmarshalJSON(data []byte) error {
+//	type Alias State
+//	aux := &struct {
+//		Value      string  `json:"value"`
+//		LastGuess  string  `json:"last_guess"`
+//		*Alias
+//	} {
+//		Alias: (*Alias)(s),
+//	}
+//
+//	if err := json.Unmarshal(data, &aux); err != nil {
+//		return err
+//	}
+//
+//	value, err := base64.StdEncoding.DecodeString(aux.Value)
+//	check(err)
+//	s.Value = value
+//
+//	last_guess, err := base64.StdEncoding.DecodeString(aux.LastGuess)
+//	check(err)
+//	s.LastGuess = last_guess
+//
+//	return nil
+//}
 
 
 func main() {
@@ -95,15 +94,18 @@ func main() {
 
 
 	args := os.Args
-	if len(args) < 2 {
+	if len(args) < 3 {
 		fmt.Print("HELP!")
 		os.Exit(-1)
 	}
 
 	state_path := args[1]
+	new_state_path := args[2]
 
 	s := State{}
 	s.load(state_path)
 
 	fmt.Print(s)
+
+	s.save(new_state_path)
 }
