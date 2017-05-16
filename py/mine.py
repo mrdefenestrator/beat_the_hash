@@ -25,7 +25,7 @@ USAGE = '''mine.py <n_values> <n_processes>
 '''
 
 
-def to_list(value):
+def unicode_to_list(value):
     '''Converts unicode str to list of integers
     
     Args:
@@ -37,7 +37,7 @@ def to_list(value):
     return list([ord(_) for _ in value])
 
 
-def to_unicode(value):
+def list_to_unicode(value):
     '''Converts list of integers to unicode str
     
     Args:
@@ -60,7 +60,8 @@ def to_base(value, base):
         list[int]: list of integers of specified base
     '''
     result = []
-    for i in range(0, int(math.ceil(math.log(value, base)))):
+    n_items = int(math.ceil(math.log(value, base))) if value else 1
+    for i in range(0, n_items):
         result.append((value // base ** i) % base)
 
     return result[::-1]
@@ -84,9 +85,7 @@ def from_base(value, base):
 
 
 def gen_guess(n, start=None):
-    '''Generator for creating value guesses - should be improved to iterate 
-    through n bytes of output then each possible value for that n bytes, this
-    currently skips guesses with any amount of forward zero padding.
+    '''Generator for creating value guesses
 
     Args:
         n (int): number of values to generate
@@ -104,20 +103,6 @@ def gen_guess(n, start=None):
         yield num
         num += 1
         current_n += 1
-
-
-def int_to_bytes(num):
-    '''Generator to convert an integer to bytes
-
-    Args:
-        num (int): number to convert
-
-    Yields:
-        bytes: bytes for the number
-    '''
-    while num > 0:
-        yield num & 0xff
-        num = num >> 8
 
 
 def hash_it(value):
@@ -169,10 +154,15 @@ def worker(start, n, best_hamming, best_value, proc_num, results):
     last_value = None
     for guess in gen_guess(n, start):
         # Iterate guesses
-        value = bytes(int_to_bytes(guess))
+        value = list_to_unicode(to_base(guess, sys.maxunicode))
 
         # Hash the guess and check resulting distance
-        hamming = hamming_it(BIN_HASH, hash_it(value))
+        try:
+            value_bytes = value.encode()
+        except ValueError:
+            # Unable to encode string, skip it
+            continue
+        hamming = hamming_it(BIN_HASH, hash_it(value_bytes))
 
         if hamming < best_hamming:
             # Maximize
@@ -190,7 +180,7 @@ def main(state_path, n, n_processes):
     '''
     if not os.path.isfile(state_path):
         # Generate initial state
-        last_state = state.State(1024, bytes(), bytes(1))
+        last_state = state.State(1024, '', '')
     else:
         # Load persisted state
         last_state = state.State.load(state_path)
@@ -204,7 +194,7 @@ def main(state_path, n, n_processes):
     results = manager.dict()
 
     # Divide work & start multiple processes
-    start_value = int.from_bytes(last_value, byteorder='big')
+    start_value = from_base(unicode_to_list(last_value), sys.maxunicode)
     jobs = []
     for i in range(n_processes):
         start = (n // n_processes) * i + start_value

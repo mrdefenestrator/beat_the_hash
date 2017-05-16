@@ -2,7 +2,6 @@
 '''
 import os
 import yaml
-import base64
 
 
 THIS_PATH = os.path.dirname(os.path.abspath(__file__))
@@ -14,8 +13,8 @@ class State(object):
         '''
         Args:
             hamming (int): the hamming distance
-            value (bytes): the value that produced the distance
-            last_guess (bytes): the last value guessed
+            value (str): the value that produced the distance
+            last_guess (str): the last value guessed
         '''
         self.hamming = hamming
         self.value = value
@@ -28,9 +27,9 @@ class State(object):
             path (str): path to the yaml results file
         '''
         result = {
-            'hamming': self.hamming,
-            'value': base64.b64encode(self.value).decode('utf-8'),
-            'last_guess': base64.b64encode(self.last_guess).decode('utf-8'),
+            'hamming':    self.hamming,
+            'value':      self.value,
+            'last_guess': self.last_guess,
         }
 
         with open(path, 'w') as fp:
@@ -51,6 +50,6 @@ class State(object):
 
         return cls(
             result['hamming'],
-            base64.b64decode(result['value']),
-            base64.b64decode(result['last_guess']),
+            result['value'],
+            result['last_guess'],
         )
