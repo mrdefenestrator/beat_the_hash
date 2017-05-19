@@ -2,7 +2,7 @@
 '''
 import unittest
 
-from mine_it import *
+from mine import *
 
 
 class HashTests(unittest.TestCase):

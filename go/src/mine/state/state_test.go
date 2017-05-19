@@ -1,24 +1,29 @@
 package state
 
 import (
-	"os"
-	"fmt"
+	"testing"
 )
 
-func main() {
-	args := os.Args
-	if len(args) < 3 {
-		fmt.Print("HELP!")
-		os.Exit(-1)
+func TestState(t *testing.T) {
+	s := State{
+		432,
+		"asdf",
+		"fdsa",
+	}
+	s.Save("test.yml")
+
+	s2 := State{}
+	s2.Load("test.yml")
+
+	if s2.Hamming != s.Hamming {
+		t.Fail()
 	}
 
-	state_path := args[1]
-	new_state_path := args[2]
+	if s2.Value != s.Value {
+		t.Fail()
+	}
 
-	s := State{}
-	s.load(state_path)
-
-	fmt.Print(s)
-
-	s.save(new_state_path)
+	if s2.LastGuess != s.LastGuess {
+		t.Fail()
+	}
 }
