@@ -6,6 +6,7 @@ import (
 	"unicode"
 	"github.com/aead/skein"
 	"bytes"
+	"fmt"
 )
 
 func Check(e error) {
@@ -27,10 +28,13 @@ func UnicodeToList(value string) []rune {
 
 // Converts list of integers to unicode str
 func ListToUnicode(value []rune) string {
-	var temp []byte
-	var buffer bytes.Buffer
+	var (
+		temp []byte
+		buffer bytes.Buffer
+	)
 
-	for _, num := range value {
+	for i, num := range value {
+		fmt.Print(i, num, utf8.ValidRune(num))
 		utf8.EncodeRune(temp, num)
 		buffer.Write(temp)
 	}
@@ -62,6 +66,7 @@ func ToBase(value int, base int) []int {
 // Converts to integer from a list of ints of base x
 func FromBase(value []int, base int) int {
 	var result int = 0
+
 	for i, num := range value {
 		result += num * int(math.Pow(float64(base), float64(i)))
 	}
@@ -91,9 +96,11 @@ func HashIt(value []byte) []byte {
 
 // Return the bitwise hamming distance
 func HammingIt(truth []byte, guess []byte) int {
-	var dist int = 0
-	var length int
-	var diff byte
+	var (
+		dist int = 0
+		length int
+		diff byte
+	)
 
 	if len(truth) < len(guess) {
 		length = len(truth)
