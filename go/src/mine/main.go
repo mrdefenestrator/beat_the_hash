@@ -30,11 +30,8 @@ func main() {
 		"n_values     number of values to mine\n" +
 		"n_processes  number of processes to use for mining"
 
-	fmt.Print("TEST")
-
 	args := os.Args
 	if len(args) < 3 {
-		fmt.Print("ERROR")
 		fmt.Print(USAGE)
 		os.Exit(-1)
 	}

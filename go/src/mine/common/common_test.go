@@ -37,6 +37,15 @@ type hamming_triple struct {
 }
 
 func TestHammingIt(t *testing.T) {
+	long_zero := []byte{}
+	long_one := []byte{}
+
+	for i := 0; i < 128; i++ {
+		long_zero = append(long_zero, byte(0x00))
+		long_one = append(long_one, byte(0xff))
+	}
+
+
 	vectors := []hamming_triple{
 		{
 			[]byte{byte(0x10)},
@@ -59,21 +68,21 @@ func TestHammingIt(t *testing.T) {
 			4,
 		},
 		{
-			[]byte{byte(0x00) * 128},
-			[]byte{byte(0xff) * 128},
-			1024,
+			long_one,
+			long_one,
+			0,
 		},
 		{
-			[]byte{byte(0xff) * 128},
-			[]byte{byte(0xff) * 128},
-			0,
+			long_zero,
+			long_one,
+			1024,
 		},
 	}
 
-	for _, vector := range vectors {
+	for n, vector := range vectors {
 		dist := HammingIt(vector.truth, vector.check)
 		if vector.dist != dist {
-			t.Fail()
+			t.Error("Test ", n, " expected ", vector.dist, " got ", dist)
 		}
 	}
 
