@@ -2,7 +2,6 @@ package common
 
 import (
 	"testing"
-	"fmt"
 )
 
 // Struct for holding values for use as hamming distance test vectors
@@ -32,17 +31,13 @@ func equal(a []rune, b []rune) bool {
 
 // Returns byte array containing n items of value
 func gen_n(value byte, n int) []byte {
-	values := []byte{}
+	values := make([]byte, n, n)
 
 	for i := 0; i < n; i++ {
 		values = append(values, value)
 	}
 
 	return values
-}
-
-func TestCheck(t *testing.T) {
-
 }
 
 func TestUnicodeToList(t *testing.T) {
@@ -68,11 +63,27 @@ func TestListToUnicode(t *testing.T) {
 }
 
 func TestToBase(t *testing.T) {
+	num := 305419896
+	list := []int{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8}
 
+	list2 := ToBase(num, 16)
+
+	for i := range list {
+		if list2[i] != list[i] {
+			t.Error("Expected ", list, " got ", list2)
+		}
+	}
 }
 
 func TestFromBase(t *testing.T) {
+	num := 305419896
+	list := []int{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8}
 
+	num2 := FromBase(list, 16)
+
+	if num2 != num {
+		t.Error("Expected ", num, " got ", num2)
+	}
 }
 
 func TestGenGuess(t *testing.T) {

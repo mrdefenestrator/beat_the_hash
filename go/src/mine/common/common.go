@@ -3,9 +3,10 @@ package common
 import (
 	"unicode/utf8"
 	"math"
-	"unicode"
 	"github.com/aead/skein"
 	"bytes"
+	"net/http"
+	"net/url"
 	"fmt"
 )
 
@@ -29,14 +30,13 @@ func UnicodeToList(value string) []rune {
 // Converts list of integers to unicode str
 func ListToUnicode(value []rune) string {
 	var (
-		temp []byte
 		buffer bytes.Buffer
 	)
+	temp := make([]byte, 4, 4)
 
-	for i, num := range value {
-		fmt.Print(i, num, utf8.ValidRune(num))
-		utf8.EncodeRune(temp, num)
-		buffer.Write(temp)
+	for _, num := range value {
+		n := utf8.EncodeRune(temp, num)
+		buffer.Write(temp[0:n])
 	}
 
 	return buffer.String()
@@ -44,19 +44,19 @@ func ListToUnicode(value []rune) string {
 
 // Converts integer to a list of ints of base x
 func ToBase(value int, base int) []int {
-	var (
-		result []int
-		n_items int
-	)
+	var n_items int
+	result := []int{}
 
 	if value > 0 {
-		n_items = int(math.Ceil(math.Log(float64(value)) / math.Log(unicode.MaxRune)))
+		n_items = int(
+			math.Ceil(math.Log(float64(value)) / math.Log(float64(base))))
 	} else {
 		n_items = 1
 	}
 
-	for i := int(0); i < n_items; i++ {
-		result = append(result, value / int(math.Pow(float64(base), float64(i))))
+	for i := n_items - 1; i >= 0; i-- {
+		result = append(
+			result, value / int(math.Pow(float64(base), float64(i))) % base)
 	}
 
 	return result
@@ -65,10 +65,11 @@ func ToBase(value int, base int) []int {
 
 // Converts to integer from a list of ints of base x
 func FromBase(value []int, base int) int {
-	var result int = 0
+	result := 0
 
 	for i, num := range value {
-		result += num * int(math.Pow(float64(base), float64(i)))
+		result += num * int(
+			math.Pow(float64(base), float64(len(value) - i - 1)))
 	}
 
 	return result
@@ -119,4 +120,18 @@ func HammingIt(truth []byte, guess []byte) int {
 	}
 
 	return dist
+}
+
+// Post value to the server
+func PostIt(server_url string, username string, value string) {
+	data := url.Values{
+		"username": {username},
+		"value":    {value},
+	}
+
+	fmt.Println(data)
+	resp, err := http.PostForm(server_url, data)
+	Check(err)
+	fmt.Println(resp.StatusCode)
+	fmt.Println(resp.Body)
 }
