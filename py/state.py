@@ -9,16 +9,16 @@ STATE_PATH = os.path.join(THIS_PATH, 'state.yml')
 
 
 class State(object):
-    def __init__(self, hamming, value, last_guess):
+    def __init__(self, hamming, value, last_value):
         '''
         Args:
-            hamming (int): the hamming distance
-            value (str): the value that produced the distance
-            last_guess (str): the last value guessed
+            hamming (int): the best hamming distance
+            value (str): the value that produced the best distance
+            last_value (str): the last value checked
         '''
         self.hamming = hamming
         self.value = value
-        self.last_guess = last_guess
+        self.last_value = last_value
 
     def save(self, path):
         '''Save the result to the path
@@ -29,7 +29,7 @@ class State(object):
         result = {
             'hamming':    self.hamming,
             'value':      self.value,
-            'last_guess': self.last_guess,
+            'last_value': self.last_value,
         }
 
         with open(path, 'w') as fp:
@@ -51,5 +51,5 @@ class State(object):
         return cls(
             result['hamming'],
             result['value'],
-            result['last_guess'],
+            result['last_value'],
         )
