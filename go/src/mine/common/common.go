@@ -5,9 +5,6 @@ import (
 	"math"
 	"github.com/aead/skein"
 	"bytes"
-	"net/http"
-	"net/url"
-	"fmt"
 )
 
 func Check(e error) {
@@ -120,18 +117,4 @@ func CalcHamming(truth []byte, guess []byte) int {
 	}
 
 	return dist
-}
-
-// Post value to the server
-func PostToServer(server_url string, username string, value string) {
-	data := url.Values{
-		"username": {username},
-		"value":    {value},
-	}
-
-	fmt.Println(data)
-	resp, err := http.PostForm(server_url, data)
-	Check(err)
-	fmt.Println(resp.StatusCode)
-	fmt.Println(resp.Body)
 }
