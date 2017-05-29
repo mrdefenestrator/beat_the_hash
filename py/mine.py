@@ -9,62 +9,27 @@ import state
 import common
 
 
-HEX_HASH = '''\
-5b4da95f5fa08280fc9879df44f418c8f9f12ba424b7757de02bbdfbae0d4c4fdf9317c80cc5fe\
-04c6429073466cf29706b8c25999ddd2f6540d4475cc977b87f4757be023f19b8f4035d7722886\
-b78869826de916a79cf9c94cc79cd4347d24b567aa3e2390a573a373a48a5e676640c79cc70197\
-e1c5e7f902fb53ca1858b6
-'''
-BIN_HASH = bytes(bytearray.fromhex(HEX_HASH))
-
 USAGE = '''mine.py <n_values> <n_processes>
 
     n_values     number of values to mine
     n_processes  number of processes to use for mining
+    state_path   path to YAML state file
 '''
 
+HEX_HASH = '''\
+5b4da95f5fa08280fc9879df44f418c8f9f12ba424b7757de02bbdfbae0d4c4fdf9317c80cc5fe\
+04c6429073466cf29706b8c25999ddd2f6540d4475cc977b87f4757be023f19b8f4035d7722886\
+b78869826de916a79cf9c94cc79cd4347d24b567aa3e2390a573a373a48a5e676640c79cc70197\
+e1c5e7f902fb53ca1858b6'''
 
-def worker(start, n_values, best_hamming, best_value, proc_num, results):
-    '''Worker process for generating, hashing & checking values
-
-    Args:
-        start (int): value to start with
-        n_values (int): number of values to test
-        best_hamming (int): previous best hamming distance
-        best_value (bytes): previous best value
-        proc_num (int): process number
-        results (dict): shared variable for providing results
-    '''
-    last_value = None
-
-    for guess in common.gen_guess(n_values, start):
-        # Iterate guesses
-        value = common.list_to_unicode(common.to_base(guess, sys.maxunicode))
-
-        # Hash the guess and check resulting distance
-        try:
-            value_bytes = value.encode()
-        except ValueError:
-            # Unable to encode string, skip it
-            continue
-        hamming = common.calc_hamming(BIN_HASH, common.hash_it(value_bytes))
-
-        if hamming < best_hamming:
-            # Maximize
-            print('New Best', hamming, value)
-            best_hamming = hamming
-            best_value = value
-
-        last_value = value
-
-    results[proc_num] = (best_hamming, best_value, last_value)
+BIN_HASH = bytes(bytearray.fromhex(HEX_HASH))
 
 
 def str_to_int(value):
     '''Converts unicode string to integer
-    
+
     Args:
-        value (str): value to convert 
+        value (str): value to convert
 
     Returns:
         int: converted value
@@ -83,15 +48,56 @@ def int_to_str(value):
     return common.list_to_unicode(common.to_base(value, sys.maxunicode))
 
 
-def main(state_path, n_values, n_processes):
-    '''Do some mining based on persistent state
+def worker(start, n_values, best_hamming, best_value, proc_num, results):
+    '''Worker process for generating, hashing & checking values
+
+    Args:
+        start (int): value to start with
+        n_values (int): number of values to test
+        best_hamming (int): previous best hamming distance
+        best_value (str): previous best value
+        proc_num (int): process number
+        results (dict): shared variable for providing results
     '''
-    if not os.path.isfile(state_path):
-        # Generate initial state
-        my_state = state.State(1024, '', '')
-    else:
+    my_state = state.State(best_hamming, best_value)
+
+    for guess in common.gen_guess(n_values, start):
+        # Iterate guesses
+        value = common.list_to_unicode(common.to_base(guess, sys.maxunicode))
+
+        # Hash the guess and check resulting distance
+        try:
+            value_bytes = value.encode()
+        except ValueError:
+            # Unable to encode string, skip it
+            continue
+        hamming = common.calc_hamming(BIN_HASH, common.hash_it(value_bytes))
+
+        if hamming < my_state.hamming:
+            # Maximize
+            print('New Best', hamming, value)
+            my_state.hamming = hamming
+            my_state.value = value
+
+        my_state.last_value = value
+
+    results[proc_num] = my_state
+
+
+def mine(n_values, n_processes, state_path):
+    '''Do some mining based on persistent state
+    
+    Args:
+        n_values (int): number of values to mine
+        n_processes (int): number of processes to use for mining
+        state_path (str): path to the YAML state file to use
+    '''
+    if os.path.isfile(state_path):
         # Load persisted state
         my_state = state.State.load(state_path)
+    else:
+        # Generate initial state
+        my_state = state.State(1024, '', '')
 
     # Create shared variable
     manager = multiprocessing.Manager()
@@ -119,10 +125,9 @@ def main(state_path, n_values, n_processes):
 
     # Determine best result
     for result in results.values():
-        hamming, value, _ = result
-        if hamming < my_state.hamming:
-            my_state.hamming = hamming
-            my_state.value = value
+        if result.hamming < my_state.hamming:
+            my_state.hamming = result.hamming
+            my_state.value = result.value
 
     my_state.last_value = int_to_str(start_value + n_values)
 
@@ -132,9 +137,17 @@ def main(state_path, n_values, n_processes):
     my_state.save(state_path)
 
 
-if __name__ == '__main__':
-    if len(sys.argv) < 3:
+def main():
+    if len(sys.argv) != 4:
         print(USAGE)
         exit(-1)
 
-    main(state.STATE_PATH, int(sys.argv[1]), int(sys.argv[2]))
+    n_values = int (sys.argv[1])
+    n_processes = int(sys.argv[2])
+    state_path = sys.argv[3]
+
+    mine(n_values, n_processes, state_path)
+
+
+if __name__ == '__main__':
+    main()

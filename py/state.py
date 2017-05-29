@@ -5,11 +5,10 @@ import yaml
 
 
 THIS_PATH = os.path.dirname(os.path.abspath(__file__))
-STATE_PATH = os.path.join(THIS_PATH, 'state.yml')
 
 
 class State(object):
-    def __init__(self, hamming, value, last_value):
+    def __init__(self, hamming=None, value=None, last_value=None):
         '''
         Args:
             hamming (int): the best hamming distance
