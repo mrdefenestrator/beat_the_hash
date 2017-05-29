@@ -17,25 +17,25 @@ func Check(e error) {
 }
 
 // Converts unicode str to list of integers
-func UnicodeToList(value string) []rune {
-	var result []rune
+func UnicodeToList(value string) []int {
+	var result []int
 
 	for _, item := range value {
-		result = append(result, item)
+		result = append(result, int(item))
 	}
 
 	return result
 }
 
 // Converts list of integers to unicode str
-func ListToUnicode(value []rune) string {
+func ListToUnicode(value []int) string {
 	var (
 		buffer bytes.Buffer
 	)
 	temp := make([]byte, 4, 4)
 
 	for _, num := range value {
-		n := utf8.EncodeRune(temp, num)
+		n := utf8.EncodeRune(temp, rune(num))
 		buffer.Write(temp[0:n])
 	}
 
@@ -91,12 +91,12 @@ func GenGuess(n int, start int) chan int {
 
 // Get the skein2014 hash of the value
 func HashIt(value []byte) []byte {
-	hash := skein.New(1024, &skein.Config{})
+	hash := skein.New(128, &skein.Config{})
 	return hash.Sum(value)
 }
 
 // Return the bitwise hamming distance
-func HammingIt(truth []byte, guess []byte) int {
+func CalcHamming(truth []byte, guess []byte) int {
 	var (
 		dist int = 0
 		length int
@@ -123,7 +123,7 @@ func HammingIt(truth []byte, guess []byte) int {
 }
 
 // Post value to the server
-func PostIt(server_url string, username string, value string) {
+func PostToServer(server_url string, username string, value string) {
 	data := url.Values{
 		"username": {username},
 		"value":    {value},

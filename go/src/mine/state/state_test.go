@@ -23,7 +23,7 @@ func TestState(t *testing.T) {
 		t.Fail()
 	}
 
-	if s2.LastGuess != s.LastGuess {
+	if s2.LastValue != s.LastValue {
 		t.Fail()
 	}
 }

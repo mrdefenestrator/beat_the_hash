@@ -140,7 +140,7 @@ func TestHammingIt(t *testing.T) {
 	}
 
 	for n, vector := range vectors {
-		dist := HammingIt(vector.truth, vector.check)
+		dist := CalcHamming(vector.truth, vector.check)
 		if vector.dist != dist {
 			t.Error("Test ", n, " expected ", vector.dist, " got ", dist)
 		}
