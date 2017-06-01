@@ -8,7 +8,7 @@ import (
 type hamming_triple struct {
 	truth []byte
 	check []byte
-	dist int
+	dist  int
 }
 
 // Returns true if both rune arrays are equal, else false
@@ -104,7 +104,7 @@ func TestHashIt(t *testing.T) {
 
 func TestHammingIt(t *testing.T) {
 	long_zero := gen_n(byte(0x00), 128)
-	long_one:= gen_n(byte(0xff), 128)
+	long_one := gen_n(byte(0xff), 128)
 
 	vectors := []hamming_triple{
 		{

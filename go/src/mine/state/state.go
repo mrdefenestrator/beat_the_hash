@@ -2,16 +2,16 @@
 package state
 
 import (
-	"io/ioutil"
 	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"mine/common"
 )
 
 // State is a struct for representing search state between runs
 type State struct {
-	Hamming   int	  `yaml:"hamming"`
-	Value     string  `yaml:"value"`
-	LastValue string  `yaml:"last_value"`
+	Hamming   int    `yaml:"hamming"`
+	Value     string `yaml:"value"`
+	LastValue string `yaml:"last_value"`
 }
 
 // Save persists the State to the specified path

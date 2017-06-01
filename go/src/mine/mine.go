@@ -1,26 +1,26 @@
 package main
 
 import (
-	"os"
+	"encoding/hex"
 	"fmt"
 	"mine/common"
-	"strconv"
 	"mine/state"
-	"encoding/hex"
+	"os"
+	"strconv"
 	"unicode/utf8"
 )
 
 // TODO: program for posting results to site
 
 var usage string = "mine.py <n_values> <n_processes> <state_path>\n\n" +
-		"n_values     number of values to mine\n" +
-		"n_processes  number of processes to use for mining\n" +
-		"state_path   path to YAML state file\n"
+	"n_values     number of values to mine\n" +
+	"n_processes  number of processes to use for mining\n" +
+	"state_path   path to YAML state file\n"
 
 var hex_hash string = "5b4da95f5fa08280fc9879df44f418c8f9f12ba424b7757de02bb" +
-		"dfbae0d4c4fdf9317c80cc5fe04c6429073466cf29706b8c25999ddd2f6540d4475" +
-		"cc977b87f4757be023f19b8f4035d7722886b78869826de916a79cf9c94cc79cd43" +
-		"47d24b567aa3e2390a573a373a48a5e676640c79cc70197e1c5e7f902fb53ca1858b6"
+	"dfbae0d4c4fdf9317c80cc5fe04c6429073466cf29706b8c25999ddd2f6540d4475" +
+	"cc977b87f4757be023f19b8f4035d7722886b78869826de916a79cf9c94cc79cd43" +
+	"47d24b567aa3e2390a573a373a48a5e676640c79cc70197e1c5e7f902fb53ca1858b6"
 
 var bin_hash []byte
 
@@ -36,8 +36,8 @@ func int_to_str(value int) string {
 
 // Worker to mine for hash values
 func worker(
-		start int, n_values int, best_hamming int, best_value string,
-		ch chan state.State,
+	start int, n_values int, best_hamming int, best_value string,
+	ch chan state.State,
 ) {
 	var last_value []byte
 
@@ -56,7 +56,6 @@ func worker(
 
 		last_value = value
 	}
-
 
 	ch <- state.State{
 		Hamming:   best_hamming,
@@ -83,10 +82,10 @@ func mine(n_values int, n_processes int, state_path string) {
 	// Divide work & start multiple workers
 	start_value := str_to_int(my_state.LastValue)
 	for i := 0; i < n_processes; i++ {
-		start := (n_values / n_processes) * i + start_value
+		start := (n_values/n_processes)*i + start_value
 		go worker(
 			start,
-			n_values / n_processes,
+			n_values/n_processes,
 			my_state.Hamming,
 			my_state.Value,
 			ch,

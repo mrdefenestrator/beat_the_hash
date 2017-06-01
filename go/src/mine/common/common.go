@@ -1,10 +1,10 @@
 package common
 
 import (
-	"unicode/utf8"
-	"math"
-	"github.com/aead/skein"
 	"bytes"
+	"github.com/aead/skein"
+	"math"
+	"unicode/utf8"
 )
 
 func Check(e error) {
@@ -53,12 +53,11 @@ func ToBase(value int, base int) []int {
 
 	for i := n_items - 1; i >= 0; i-- {
 		result = append(
-			result, value / int(math.Pow(float64(base), float64(i))) % base)
+			result, value/int(math.Pow(float64(base), float64(i)))%base)
 	}
 
 	return result
 }
-
 
 // Converts to integer from a list of ints of base x
 func FromBase(value []int, base int) int {
@@ -66,7 +65,7 @@ func FromBase(value []int, base int) int {
 
 	for i, num := range value {
 		result += num * int(
-			math.Pow(float64(base), float64(len(value) - i - 1)))
+			math.Pow(float64(base), float64(len(value)-i-1)))
 	}
 
 	return result
@@ -74,14 +73,14 @@ func FromBase(value []int, base int) int {
 
 // Generator for creating value guesses
 func GenGuess(n int, start int) chan int {
-	ch := make (chan int)
+	ch := make(chan int)
 
-	go func () {
-		for i := start; i < n + start; i++ {
+	go func() {
+		for i := start; i < n+start; i++ {
 			ch <- i
 		}
 		close(ch)
-	} ()
+	}()
 
 	return ch
 }
@@ -95,9 +94,9 @@ func HashIt(value []byte) []byte {
 // Return the bitwise hamming distance
 func CalcHamming(truth []byte, guess []byte) int {
 	var (
-		dist int = 0
+		dist   int = 0
 		length int
-		diff byte
+		diff   byte
 	)
 
 	if len(truth) < len(guess) {
