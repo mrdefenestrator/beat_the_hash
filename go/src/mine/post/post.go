@@ -2,28 +2,28 @@ package main
 
 import (
 	"fmt"
-	"net/url"
-	"net/http"
-	"os"
+	"io/ioutil"
 	"mine/common"
 	"mine/state"
-	"io/ioutil"
+	"net/http"
+	"net/url"
+	"os"
 )
 
-var usage string = "post.py <username> <state_path>\n\n" +
-		"username     username to post to server with\n" +
-		"state_path   path to YAML state file\n"
+var usage = "post.py <username> <state_path>\n\n" +
+	"username     username to post to server with\n" +
+	"state_path   path to YAML state file\n"
 
-var beatTheHashUri string = "http://beatthehash.com/hash"
+var beatTheHashURI = "http://beatthehash.com/hash"
 
-// Post value to the server
-func postIt(serverUrl string, username string, value string) {
+// postIt posts value to the server
+func postIt(serverURL string, username string, value string) {
 	data := url.Values{
 		"username": {username},
 		"value":    {value},
 	}
 
-	resp, err := http.PostForm(serverUrl, data)
+	resp, err := http.PostForm(serverURL, data)
 	common.Check(err)
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
@@ -46,5 +46,5 @@ func main() {
 
 	lastState := state.State{}
 	lastState.Load(statePath)
-	postIt(beatTheHashUri, username, lastState.Value)
+	postIt(beatTheHashURI, username, lastState.Value)
 }

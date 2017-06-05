@@ -2,18 +2,20 @@ package common
 
 import (
 	"bytes"
-	"github.com/whyrusleeping/FastGoSkein"
 	"math"
 	"unicode/utf8"
+
+	"github.com/whyrusleeping/FastGoSkein"
 )
 
+// Check determines whether there is an error and panics
 func Check(e error) {
 	if e != nil {
 		panic(e)
 	}
 }
 
-// Converts unicode str to list of integers
+// UnicodeToList converts unicode str to list of integers
 func UnicodeToList(value string) []int {
 	var result []int
 
@@ -24,7 +26,7 @@ func UnicodeToList(value string) []int {
 	return result
 }
 
-// Converts list of integers to unicode str
+// ListToUnicode converts list of integers to unicode str
 func ListToUnicode(value []int) string {
 	var (
 		buffer bytes.Buffer
@@ -39,7 +41,7 @@ func ListToUnicode(value []int) string {
 	return buffer.String()
 }
 
-// Converts integer to a list of ints of base x
+// ToBase converts integer to a list of ints of base x
 func ToBase(value int, base int) []int {
 	var nItems int
 	result := []int{}
@@ -59,7 +61,7 @@ func ToBase(value int, base int) []int {
 	return result
 }
 
-// Converts to integer from a list of ints of base x
+// FromBase converts to integer from a list of ints of base x
 func FromBase(value []int, base int) int {
 	result := 0
 
@@ -71,7 +73,7 @@ func FromBase(value []int, base int) int {
 	return result
 }
 
-// Generator for creating value guesses
+// GenGuess generates value guesses
 func GenGuess(n int, start int) chan int {
 	ch := make(chan int)
 
@@ -85,7 +87,7 @@ func GenGuess(n int, start int) chan int {
 	return ch
 }
 
-// Get the skein2014 hash of the value
+// HashIt returns the skein2014 hash of the value
 func HashIt(value []byte) []byte {
 	digest := new(skein.Skein1024)
 	digest.Init(1024)
@@ -96,10 +98,10 @@ func HashIt(value []byte) []byte {
 	return sum
 }
 
-// Return the bitwise hamming distance
+// CalcHamming returns the bitwise hamming distance
 func CalcHamming(truth []byte, guess []byte) int {
 	var (
-		dist   int = 0
+		dist   = 0
 		length int
 		diff   byte
 	)
@@ -114,7 +116,7 @@ func CalcHamming(truth []byte, guess []byte) int {
 		diff = truth[i] ^ guess[i]
 		for j := 0; j < 8; j++ {
 			if (diff & byte(0x01)) != 0 {
-				dist += 1
+				dist++
 			}
 			diff = diff >> 1
 		}

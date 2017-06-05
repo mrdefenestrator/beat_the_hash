@@ -1,10 +1,11 @@
-// Module for saving and loading state
+// Package state is for saving and loading miner state
 package state
 
 import (
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"mine/common"
+
+	"gopkg.in/yaml.v2"
 )
 
 // State is a struct for representing search state between runs
