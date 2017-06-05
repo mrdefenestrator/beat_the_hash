@@ -10,11 +10,11 @@ import (
 	"io/ioutil"
 )
 
-
-var beatthehashUri string = "http://beatthehash.com/hash"
 var usage string = "post.py <username> <state_path>\n\n" +
 		"username     username to post to server with\n" +
 		"state_path   path to YAML state file\n"
+
+var beatTheHashUri string = "http://beatthehash.com/hash"
 
 // Post value to the server
 func postIt(serverUrl string, username string, value string) {
@@ -46,5 +46,5 @@ func main() {
 
 	lastState := state.State{}
 	lastState.Load(statePath)
-	postIt(beatthehashUri, username, lastState.Value)
+	postIt(beatTheHashUri, username, lastState.Value)
 }
