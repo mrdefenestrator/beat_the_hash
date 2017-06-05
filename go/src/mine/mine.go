@@ -74,9 +74,6 @@ func mine(nValues int, nProcesses int, statePath string) {
 		myState = state.State{Hamming: 1024, Value: "", LastValue: ""}
 	}
 
-	fmt.Println("before", myState)
-	fmt.Println("")
-
 	// Create channel for results
 	ch := make(chan state.State)
 
@@ -99,9 +96,6 @@ func mine(nValues int, nProcesses int, statePath string) {
 		if result.Hamming < myState.Hamming {
 			myState.Hamming = result.Hamming
 			myState.Value = result.Value
-			fmt.Println("value", result.Value)
-			fmt.Println("reset", myState)
-			fmt.Println("")
 		}
 		nResults++
 
@@ -114,9 +108,6 @@ func mine(nValues int, nProcesses int, statePath string) {
 	myState.LastValue = intToStr(startValue + nValues)
 
 	fmt.Println("Best this run", myState.Hamming, myState.Value)
-
-	fmt.Println("after", myState)
-	fmt.Println("")
 
 	// Persist state
 	myState.Save(statePath)
