@@ -12,7 +12,7 @@ func TestState(t *testing.T) {
 	}
 	s.Save("test.yml")
 
-	s2 := State{}
+	var s2 State
 	s2.Load("test.yml")
 
 	if s2.Hamming != s.Hamming {

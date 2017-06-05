@@ -2,7 +2,7 @@ package common
 
 import (
 	"bytes"
-	"github.com/aead/skein"
+	"github.com/whyrusleeping/FastGoSkein"
 	"math"
 	"unicode/utf8"
 )
@@ -41,17 +41,17 @@ func ListToUnicode(value []int) string {
 
 // Converts integer to a list of ints of base x
 func ToBase(value int, base int) []int {
-	var n_items int
+	var nItems int
 	result := []int{}
 
 	if value > 0 {
-		n_items = int(
+		nItems = int(
 			math.Ceil(math.Log(float64(value)) / math.Log(float64(base))))
 	} else {
-		n_items = 1
+		nItems = 1
 	}
 
-	for i := n_items - 1; i >= 0; i-- {
+	for i := nItems - 1; i >= 0; i-- {
 		result = append(
 			result, value/int(math.Pow(float64(base), float64(i)))%base)
 	}
@@ -87,8 +87,13 @@ func GenGuess(n int, start int) chan int {
 
 // Get the skein2014 hash of the value
 func HashIt(value []byte) []byte {
-	hash := skein.New(128, &skein.Config{})
-	return hash.Sum(value)
+	digest := new(skein.Skein1024)
+	digest.Init(1024)
+	digest.Update(value)
+
+	sum := make([]byte, 128)
+	digest.Final(sum)
+	return sum
 }
 
 // Return the bitwise hamming distance

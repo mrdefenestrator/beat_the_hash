@@ -4,15 +4,16 @@ import (
 	"testing"
 )
 
-// Struct for holding values for use as hamming distance test vectors
-type hamming_triple struct {
+// hammingTriple is a struct for holding values for use as hamming distance
+// test vectors
+type hammingTriple struct {
 	truth []byte
 	check []byte
 	dist  int
 }
 
-// Returns true if both rune arrays are equal, else false
-func equal(a []rune, b []rune) bool {
+// equal returns true if both int arrays are equal, else false
+func equal(a []int, b []int) bool {
 	var length int
 
 	if len(a) < len(b) {
@@ -29,8 +30,8 @@ func equal(a []rune, b []rune) bool {
 	return true
 }
 
-// Returns byte array containing n items of value
-func gen_n(value byte, n int) []byte {
+// genN returns byte array containing n items of value
+func genN(value byte, n int) []byte {
 	values := make([]byte, n, n)
 
 	for i := 0; i < n; i++ {
@@ -42,7 +43,7 @@ func gen_n(value byte, n int) []byte {
 
 func TestUnicodeToList(t *testing.T) {
 	drift := "ドリフト"
-	list := []rune{0x30c9, 0x30ea, 0x30d5, 0x30c8}
+	list := []int{0x30c9, 0x30ea, 0x30d5, 0x30c8}
 
 	list2 := UnicodeToList(drift)
 
@@ -53,7 +54,7 @@ func TestUnicodeToList(t *testing.T) {
 
 func TestListToUnicode(t *testing.T) {
 	drift := "ドリフト"
-	list := []rune{0x30c9, 0x30ea, 0x30d5, 0x30c8}
+	list := []int{0x30c9, 0x30ea, 0x30d5, 0x30c8}
 
 	drift2 := ListToUnicode(list)
 
@@ -103,10 +104,10 @@ func TestHashIt(t *testing.T) {
 }
 
 func TestHammingIt(t *testing.T) {
-	long_zero := gen_n(byte(0x00), 128)
-	long_one := gen_n(byte(0xff), 128)
+	longZero := genN(byte(0x00), 128)
+	longOne := genN(byte(0xff), 128)
 
-	vectors := []hamming_triple{
+	vectors := []hammingTriple{
 		{
 			[]byte{byte(0x10)},
 			[]byte{byte(0x01)},
@@ -128,13 +129,13 @@ func TestHammingIt(t *testing.T) {
 			4,
 		},
 		{
-			long_one,
-			long_one,
+			longOne,
+			longOne,
 			0,
 		},
 		{
-			long_zero,
-			long_one,
+			longZero,
+			longOne,
 			1024,
 		},
 	}
